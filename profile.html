@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="./node_modules/axios/dist/axios.min.js"></script>
+    <title>Document</title>
+    <style>
+      body{
+        background: #ecf0f1;
+      }
+      .card{
+        margin-top: 30px;
+      }
+      #add-post-btn{
+        position: fixed;
+        bottom: 5%;
+        right: 7%;
+        height: 70px;
+        width: 70px;
+        color: white;
+        text-align: center;
+        font-size: 40px;
+        cursor: pointer;
+        box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);
+      }
+      .posts-comments-num {
+        font-size: 50px;
+      }
+      /* ==== LOADER CSS ==== */
+      .lds-ring {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+        background-color: rgba(128, 128, 128, 0.527);
+        border-radius: 20px;
+      }
+      .lds-ring div {
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border: 8px solid #fff;
+        border-radius: 50%;
+        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        border-color: #fff transparent transparent transparent;
+      }
+      .lds-ring div:nth-child(1) {
+        animation-delay: -0.45s;
+      }
+      .lds-ring div:nth-child(2) {
+        animation-delay: -0.3s;
+      }
+      .lds-ring div:nth-child(3) {
+        animation-delay: -0.15s;
+      }
+      @keyframes lds-ring {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      /* ==== // LOADER CSS // ==== */
+    </style>
+</head>
+  <!-- alert -->
+  <div class="show fade" id="success-alert" style="position: fixed;z-index: 9999999;width: 30%;bottom: 0;right: 0;"></div>
+  <!-- // alert // -->
+
+
+  <!-- LOADER HTML -->
+  <div id="loader" style="position: fixed; left: 0px; right: 0px; bottom: 0px; top: 0px;display: flex;justify-content: center;align-items: center;z-index: 9999;">
+    <div class="lds-ring">
+      <div></div><div></div><div></div><div></div>
+    </div>
+  </div>
+  <!-- // LOADER HTML // -->
+
+  
+  <!-- modals -->
+
+  <!-- login modal -->
+  <div class="modal fade" id="login-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Login</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="recipient-name" class="col-form-label">Username:</label>
+              <input type="text" class="form-control" id="username-input">
+            </div>
+            <div class="mb-3">
+              <label for="message-text" class="col-form-label">Password:</label>
+              <input type="password" class="form-control" id="password-input">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="loginBtnClicked()">Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- // login modal // -->
+
+  <!-- register modal -->
+  <div class="modal fade" id="register-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Register a new user</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label">Profile Image:</label>
+                <input type="file" class="form-control" id="register-image-input">
+              </div>
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label">Username:</label>
+                <input type="text" class="form-control" id="register-username-input">
+              </div>
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label">Name:</label>
+                <input type="text" class="form-control" id="register-name-input">
+              </div>
+              <div class="mb-3">
+                <label for="message-text" class="col-form-label">Password:</label>
+                <input type="password" class="form-control" id="register-password-input">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="registerBtnClicked()">Register</button>
+          </div>
+        </div>
+      </div>
+  </div>
+  <!-- // register modal // -->
+
+  <!-- add btn modal -->
+  <div class="modal fade" id="add-btn-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="post-modal-title">Add a new post</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <div class="mb-3">
+                    <label for="recipient-name" class="col-form-label">Tilte</label>
+                    <input type="text" class="form-control" id="add-post-title-input">
+                    <input type="hidden" id="post-id-input" value="">
+                  </div>
+
+                  <div class="mb-3">
+                    <textarea name="" class="form-control" id="add-post-body-input" style="width: 100%; height: 100px;resize: none;"></textarea>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="recipient-name" class="col-form-label">Image</label>
+                    <input type="file" class="form-control" id="add-post-image-input">
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="post-modal-submit-btn" class="btn btn-primary" onclick="addNewPostClicked()">Create</button>
+              </div>
+            </div>
+          </div>
+  </div>
+  <!-- // add btn modal // -->
+
+  <!-- delete post modal -->
+  <div id="delete-post-modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete Post</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this post?</p>
+        </div>
+        <div class="modal-footer">
+          <input type="hidden" id="delete-post-input" value="">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="button" class="btn btn-danger" onclick="deletePostConfirmed()">Yes, Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- // delete post modal //  -->
+
+  <!-- // modals // -->
+
+  <!-- add post button -->
+  <div id="add-post-btn" class="bg-primary rounded-circle" onclick="addNewPostBtnClicked()">
+    +
+  </div>
+  <!-- add post button -->
+
+    <!-- nav bar cont -->
+    <div class="container">
+      <div class="d-flex justify-content-center">
+        <div class="col-9">
+          <nav class="navbar navbar-expand-lg bg-body-tertiary shadow rounded pt-3">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="home.html">Tarmeez</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="home.html">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="profile.html">Profile</a>
+                  </li>
+                </ul>
+                <!-- for non-logged in user -->
+                <div id="login-div">
+                    <button id="login-btn" type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#login-modal">Login</button>
+                    <button id="register-btn" type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#register-modal">Register</button>
+                </div>
+                <!-- // for non-logged in user // -->
+
+                <!-- logged in user -->
+                <div id="logout-div">
+                  <img id="nav-user-image" src="./profile-pics/1.jpg" style="width: 40px;height: 40px;" class="rounded-circle">
+                  <b id="nav-username">@Yarhmm</b>
+                  <button onclick="logout()" id="logout-btn" type="button" class="btn btn-outline-danger" >Logout</button>
+                </div>
+                <!-- // logged in user // -->
+              </div>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+
+    </div>
+    <!-- // nav bar cont // -->
+
+
+
+    <!-- container -->
+    <div class="container" style="height: fit-content;">
+
+      <!-- profile card -->
+      <div class="d-flex justify-content-center mt-5">
+        <div class="col-9">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <!-- img col -->
+                        
+                        <div class="col-2" style="display: flex; flex-direction: column; justify-content: space-evenly;">
+                            <img id="profile-img" src="" alt="" style="height: 125px; width: 125px;"class="rounded-circle">
+                        </div>
+                        
+                        
+                        <!-- // img col // -->
+
+                        <!-- email + name + username -->
+                        <div class="col-4" style="display: flex; flex-direction: column; justify-content: space-evenly; font-weight: bold;">
+                            <div id="email">
+                                
+                            </div>
+                            <div id="name">
+                                
+                            </div>
+                            <div id="username">
+                                
+                            </div>
+                        </div>
+                        <!-- // email + name + username // -->
+
+                        <!-- posts & commnets count -->
+                        <div class="col-4" style="display: flex; flex-direction: column; justify-content: space-evenly;">
+                            <div>
+                                <span class="posts-comments-num" id="posts-count" style="font-size: large;font-weight: bold;"></span>
+                            </div>
+
+                            <div>
+                                <span class="posts-comments-num" id="comments-count" style="font-size: large;font-weight: bold;"></span>
+                            </div>
+
+                        </div>
+                        <!-- // posts & comments count // -->
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <!-- // profile card // -->
+      <div class="d-flex justify-content-center mt-5">
+        <div class="col-9">
+            <h1><span id="username-span"></span></h1>
+        </div>
+        
+      </div>
+      <!-- posts -->
+      <div class="d-flex justify-content-center mt-5">
+        <div class="col-9">
+          <div id="user-posts">
+            
+            <!-- post -->
+            <div class="card shadow">
+              <div class="card-header">
+                <img src="./profile-pics/1.jpg" alt="" style="width: 40px;height: 40px;" class="rounded-circle border border-2">
+                <b>@Yarhmm</b>
+              </div>
+              <div class="card-body">
+                <img src="./placeholders/1.jpg" alt="" style="width:100%;">
+                <h6 style="color: gray;"class="mt-1">6 min ago</h6>
+                <h5>Hello World</h5>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus assumenda atque deserunt alias. Officiis officia amet optio perferendis quidem itaque, dolorem neque pariatur. Consequatur incidunt aliquam accusamus, asperiores cupiditate nisi!</p>
+                <hr>
+                <div>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
+                  </svg>
+                  <span>(3) Comments</span>
+                </div>
+              </div>
+            </div>
+            <!-- // post // -->
+
+            <!-- post -->
+            <div class="card shadow">
+              <div class="card-header">
+                <img src="./profile-pics/1.jpg" alt="" style="width: 40px;height: 40px;" class="rounded-circle border border-2">
+                <b>@Yarhmm</b>
+              </div>
+              <div class="card-body">
+                <img src="./placeholders/1.jpg" alt="" style="width:100%;">
+                <h6 style="color: gray;"class="mt-1">6 min ago</h6>
+                <h5>Hello World</h5>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus assumenda atque deserunt alias. Officiis officia amet optio perferendis quidem itaque, dolorem neque pariatur. Consequatur incidunt aliquam accusamus, asperiores cupiditate nisi!</p>
+                <hr>
+                <div>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
+                  </svg>
+                  <span>(3) Comments</span>
+                </div>
+              </div>
+            </div>
+            <!-- // post // -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- // container // -->
+<script src="./mainLogic.js"></script>
+<script src="./profileScripts.js"></script>
